@@ -1,0 +1,51 @@
+# Deployment serving the deck from a ConfigMap-backed nginx.
+# nginx-unprivileged:alpine on 8080, tiny resources, ConfigMap mounted
+# read-only at the nginx docroot. Placeholders are filled by envsubst
+# in deploy.sh.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_NAME}
+  labels:
+    app: ${APP_NAME}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${APP_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}
+    spec:
+      containers:
+      - name: nginx
+        image: docker.io/nginxinc/nginx-unprivileged:alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080   # the image listens on 8080; do not change without custom nginx.conf
+          protocol: TCP
+        # Gate Ready on nginx actually serving: without this, Kubernetes marks
+        # the pod Ready the instant the process starts and the router can 502
+        # during the endpoint flip on every deploy.
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: html
+          readOnly: true
+      volumes:
+      - name: html
+        configMap:
+          name: ${CONFIGMAP_NAME}   # kustomize rewrites this to the content-hashed generated name

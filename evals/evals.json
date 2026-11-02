@@ -1,0 +1,23 @@
+{
+  "skill_name": "html-scene-deck",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Make me a single-file HTML presentation deck for a Red Hat executive briefing on platform engineering in 2027 — dark theme, animated, about 8 slides, with at least one cards scene and one animated bar chart, plus a next-steps and a sources appendix.",
+      "expected_output": "A valid single-file scene-engine HTML deck (~8 scenes) with Red Hat tokens, arrow-key navigation, scene dots, per-scene animations, and a sources appendix. Passes validate_deck.py.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "I've got a finished deck at input/starter-deck.html. Set it up to deploy to my OpenShift cluster in namespace 'token-demo' — nginx-unprivileged serving the deck from a ConfigMap — using kustomize with envsubst for the app name, configmap name, and namespace. My current kube context points at the wrong cluster, so just render the final manifests so I can review them before applying.",
+      "expected_output": "Rendered deployment.yaml + kustomization.yaml (namespace token-demo, app/configmap names substituted) with the deck staged as index.html, plus the kubectl apply -k command. ConfigMap name reference rewritten to content-hashed name.",
+      "files": ["input/starter-deck.html"]
+    },
+    {
+      "id": 2,
+      "prompt": "Take the deck at input/starter-deck.html and add a 'Live Demo' scene between 'The Numbers' (sc-chart) and 'The Point' (sc-quote) with a three-step animated request flow (request arrives, routed, answered), then run the deck's validation and make sure it passes.",
+      "expected_output": "The 7-scene deck with the new scene correctly registered in scenes[]/sceneLabels[]/sceneAgendaMap, anim function + dispatch case, reveal targets present in DOM, state-reset intact, and validation passing.",
+      "files": ["input/starter-deck.html"]
+    }
+  ]
+}
